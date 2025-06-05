@@ -1,0 +1,129 @@
+//
+// TMDb API utility for CineQuiz & ArtGuess
+//
+// Centralizes movie/actor/poster calls for all quiz features (actor-based, poster-based, language selection, etc.)
+// Handles API key securely via environment variable at build time.
+//
+
+// PUBLIC_INTERFACE
+/**
+ * All TMDb API calls go through this utility.
+ * 
+ * Usage:
+ *   import tmdbApi from './tmdbApi';
+ *   const movie = await tmdbApi.getMovieById(id, 'en');
+ */
+const tmdbApi = (() => {
+  // Load API key from environment variable injected at build time
+  // In Create React App, use REACT_APP_ prefix for env variables.
+  const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
+
+  // Fail clearly if API key missing
+  if (!API_KEY) {
+    // This will only show at runtime/build time.
+    // In production builds, ensure env is set!
+    throw new Error(
+      "TMDb API key not set. Please set REACT_APP_TMDB_API_KEY in your environment."
+    );
+  }
+
+  const BASE_URL = 'https://api.themoviedb.org/3';
+
+  // Generic fetch wrapper for API
+  async function apiFetch(endpoint, params = {}) {
+    // Always include 'api_key' and handle language
+    const url = new URL(`${BASE_URL}${endpoint}`);
+    url.searchParams.append('api_key', API_KEY);
+    // Support language selection (default 'en', or 'ta' for Tamil)
+    if (params.language) {
+      url.searchParams.append('language', params.language);
+      delete params.language;
+    }
+    Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, v));
+
+    const resp = await fetch(url);
+    if (!resp.ok) {
+      throw new Error(`TMDb API error: ${resp.status} - ${resp.statusText}`);
+    }
+    return await resp.json();
+  }
+
+  // PUBLIC_INTERFACE
+  /**
+   * Fetch a movie object by ID
+   */
+  async function getMovieById(movieId, language = 'en') {
+    return await apiFetch(`/movie/${movieId}`, { language });
+  }
+
+  // PUBLIC_INTERFACE
+  /**
+   * Fetch cast & crew for a movie (used in Actor-based quiz)
+   */
+  async function getMovieCredits(movieId, language = 'en') {
+    // TMDb /movie/{id}/credits does not fully honor language param but attach anyway
+    return await apiFetch(`/movie/${movieId}/credits`, { language });
+  }
+
+  // PUBLIC_INTERFACE
+  /**
+   * Fetch posters for a movie (used in poster-based guess)
+   */
+  async function getMoviePosters(movieId, language = 'en') {
+    // /images endpoint, filter for posters
+    const images = await apiFetch(`/movie/${movieId}/images`, { include_image_language: `${language},null` });
+    // Only posters — return array
+    return images.posters || [];
+  }
+
+  // PUBLIC_INTERFACE
+  /**
+   * Search for movies by title (for quiz randomization, admin, AI drawing, etc.)
+   */
+  async function searchMovies(query, language = 'en', page = 1) {
+    return await apiFetch(`/search/movie`, {
+      query,
+      language,
+      page
+    });
+  }
+
+  // PUBLIC_INTERFACE
+  /**
+   * Get info for a given person (actor) by ID
+   */
+  async function getPersonById(personId, language = 'en') {
+    return await apiFetch(`/person/${personId}`, { language });
+  }
+
+  // PUBLIC_INTERFACE
+  /**
+   * Discover movies for quiz randomization.
+   * Use genre, year, language etc as needed. Callers choose criteria.
+   */
+  async function discoverMovies(params = {}) {
+    return await apiFetch(`/discover/movie`, params);
+  }
+
+  // PUBLIC_INTERFACE
+  /**
+   * Helper: Get full poster URL (TMDb returns only relative paths)
+   */
+  function getPosterUrl(posterPath, size = 'w342') {
+    // size: w92, w154, w185, w342, w500, w780, original
+    if (!posterPath) return null;
+    return `https://image.tmdb.org/t/p/${size}${posterPath}`;
+  }
+
+  return {
+    getMovieById,
+    getMovieCredits,
+    getMoviePosters,
+    getPosterUrl,
+    searchMovies,
+    getPersonById,
+    discoverMovies,
+  };
+})();
+
+export default tmdbApi;
