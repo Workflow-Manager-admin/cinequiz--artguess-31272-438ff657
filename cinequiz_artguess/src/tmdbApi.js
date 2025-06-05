@@ -15,16 +15,15 @@ Integrates the TMDb API key directly within this file (as requested)—no relian
  *   const movie = await tmdbApi.getMovieById(id, 'en');
  */
 const tmdbApi = (() => {
-  // Load API key from environment variable injected at build time
-  // In Create React App, use REACT_APP_ prefix for env variables.
-  const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
+  // === TMDb API KEY IS INCLUDED BELOW (for demo/educational use) ===
+  // WARNING: This exposes the API key to the client and is NOT recommended for production.
+  // Replace this with your actual TMDb API key:
+  const API_KEY = "REPLACE_THIS_WITH_YOUR_TMDB_KEY"; // <-- Put your TMDb v3 API key here as a string
 
-  // Fail clearly if API key missing
-  if (!API_KEY) {
-    // This will only show at runtime/build time.
-    // In production builds, ensure env is set!
+  // Fail clearly if key not present (for dev clarity)
+  if (!API_KEY || API_KEY === "REPLACE_THIS_WITH_YOUR_TMDB_KEY") {
     throw new Error(
-      "TMDb API key not set. Please set REACT_APP_TMDB_API_KEY in your environment."
+      "TMDb API key is not set! Please provide your actual TMDb API key in src/tmdbApi.js"
     );
   }
 
