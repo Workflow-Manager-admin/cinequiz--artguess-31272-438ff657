@@ -127,3 +127,33 @@ const tmdbApi = (() => {
 })();
 
 export default tmdbApi;
+
+/**
+ * ========== SAMPLE USAGE FOR TMDb API ==========
+ * These are examples for your reference—remove or use as developer guides.
+ * 
+ * import tmdbApi from './tmdbApi';
+ * 
+ * // 1. Get basic info for a movie by TMDb movie ID (e.g., "550" = Fight Club)
+ * tmdbApi.getMovieById(550).then(console.log);
+ * 
+ * // 2. Get cast/crew for a movie
+ * tmdbApi.getMovieCredits(550).then(console.log);
+ * 
+ * // 3. Get all available posters for a movie
+ * tmdbApi.getMoviePosters(550).then(posters => {
+ *    if (posters.length > 0) {
+ *       const fullPosterUrl = tmdbApi.getPosterUrl(posters[0].file_path);
+ *       console.log(fullPosterUrl);
+ *    }
+ * });
+ * 
+ * // 4. Search for movies by title
+ * tmdbApi.searchMovies("Inception").then(data => console.log(data.results));
+ * 
+ * // 5. Get actor info by person ID (e.g., Brad Pitt = 287)
+ * tmdbApi.getPersonById(287).then(console.log);
+ * 
+ * // 6. Use with language option (Tamil, "ta")
+ * tmdbApi.getMovieById(550, "ta").then(console.log);
+ */
