@@ -1,0 +1,4 @@
+{
+    "command": "npm run test",
+    "working_directory": "/home/kavia/workspace/code-generation/cinequiz--artguess-31272-438ff657/cinequiz_artguess"
+}
