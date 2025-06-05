@@ -1,9 +1,10 @@
 //
-// TMDb API utility for CineQuiz & ArtGuess
-//
-// Centralizes movie/actor/poster calls for all quiz features (actor-based, poster-based, language selection, etc.)
-// Handles API key securely via environment variable at build time.
-//
+/*
+TMDb API utility for CineQuiz & ArtGuess
+
+Centralizes movie/actor/poster calls for all quiz features (actor-based, poster-based, language selection, etc.).
+Integrates the TMDb API key directly within this file (as requested)—no reliance on environment variables.
+*/
 
 // PUBLIC_INTERFACE
 /**
